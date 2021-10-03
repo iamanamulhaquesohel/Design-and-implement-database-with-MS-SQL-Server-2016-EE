@@ -2,7 +2,7 @@
 
 
 #Evidence Exam
-File Name:  1264855.sql is the Evidence Question Answer file.
+File Name: 1264855-Mid.sql, 1264855.sql is the Evidence Question Answer file.
 I uploaded the sample question with the file.
 
 #Project
