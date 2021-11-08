@@ -109,7 +109,7 @@ BEGIN TRY
 END TRY
 BEGIN CATCH
            ;
-		   THROW 50001,'Error encountered',1
+		   THROW 50001,'Error encountered', 1
 		   RETURN 0
 END CATCH
 GO
@@ -239,8 +239,8 @@ BEGIN CATCH
 		   RETURN 0
 END CATCH
 GO
---CREATE SCALAR FUNCTION--
-CREATE FUNCTION fnScalar(@gurdian_id INT)RETURNS INT
+--CREATE CHILDREN COUNT SCALAR FUNCTION--
+CREATE FUNCTION fnScalarchildren(@gurdian_id INT)RETURNS INT
 AS
 BEGIN
     DECLARE @n INT
@@ -249,16 +249,64 @@ BEGIN
 	RETURN @n
 END
 GO
---CREATE TABLE VALUED FUNCTION--
-CREATE FUNCTION  fnTable(@gurdian_id INT)RETURNS TABLE
+--CREATE EMPLOYEE COUNT SCALAR FUNCTION--
+CREATE FUNCTION fnScalaremployee(@branch_id INT)RETURNS INT
+AS
+BEGIN
+    DECLARE @n INT
+	SELECT @n=COUNT(*)FROM employees
+	WHERE branch_id=@branch_id
+	RETURN @n
+END
+GO
+--CREATE TABLE VALUED FUNCTION BY GURDIAN ID--
+CREATE FUNCTION fnTablebygurdianId(@gurdian_id INT)RETURNS TABLE
 AS
 RETURN
 (
-   SELECT b.branch_name,e.employee_id,e.employee_name,g.gurdian_name,c.children_id,c.children_name
-FROM branches b
-INNER JOIN employees e ON b.branch_id=e.branch_id
-INNER JOIN childrens c ON e.branch_id=c.branch_id
-INNER JOIN gurdians g ON c.gurdian_id=g.gurdian_id
+	SELECT b.branch_id, b.branch_name,e.employee_id,e.employee_name,g.gurdian_id, g.gurdian_name,c.children_id,c.children_name
+	FROM branches b
+	INNER JOIN employees e ON b.branch_id=e.branch_id
+	INNER JOIN childrens c ON e.branch_id=c.branch_id
+	INNER JOIN gurdians g ON c.gurdian_id=g.gurdian_id
+)
+GO
+
+--CREATE TABLE VALUED FUNCTION BY BRANCHES ID--
+CREATE FUNCTION fnTablebybranchId(@branch_id INT)RETURNS TABLE
+AS
+RETURN
+(
+	SELECT b.branch_id, b.branch_name,e.employee_id,e.employee_name,g.gurdian_id, g.gurdian_name,c.children_id,c.children_name
+	FROM branches b
+	INNER JOIN employees e ON b.branch_id=e.branch_id
+	INNER JOIN childrens c ON e.branch_id=c.branch_id
+	INNER JOIN gurdians g ON c.gurdian_id=g.gurdian_id
+)
+GO
+--CREATE TABLE VALUED FUNCTION BY EMPLOYEE ID--
+CREATE FUNCTION fnTablebyemployeeId(@employee_id INT)RETURNS TABLE
+AS
+RETURN
+(
+	SELECT b.branch_id, b.branch_name,e.employee_id,e.employee_name,g.gurdian_id, g.gurdian_name,c.children_id,c.children_name
+	FROM branches b
+	INNER JOIN employees e ON b.branch_id=e.branch_id
+	INNER JOIN childrens c ON e.branch_id=c.branch_id
+	INNER JOIN gurdians g ON c.gurdian_id=g.gurdian_id
+)
+GO
+
+--CREATE TABLE VALUED FUNCTION BY CHILDREN ID--
+CREATE FUNCTION fnTablebychildrenId(@children_id INT)RETURNS TABLE
+AS
+RETURN
+(
+	SELECT b.branch_id, b.branch_name,e.employee_id,e.employee_name,g.gurdian_id, g.gurdian_name,c.children_id,c.children_name
+	FROM branches b
+	INNER JOIN employees e ON b.branch_id=e.branch_id
+	INNER JOIN childrens c ON e.branch_id=c.branch_id
+	INNER JOIN gurdians g ON c.gurdian_id=g.gurdian_id
 )
 GO
 --CRAETE VIEW--
@@ -270,20 +318,38 @@ INNER JOIN employees e ON b.branch_id=e.branch_id
 INNER JOIN childrens c ON e.branch_id=c.branch_id
 INNER JOIN gurdians g ON c.gurdian_id=g.gurdian_id
 GO
---CREATE TRIGGER--
-CREATE TRIGGER trEmpInsert
+--CREATE TRIGGER FOR EMPLOYEE DATA INSERT--
+CREATE TRIGGER trEmployeeInsert
 ON employees FOR INSERT 
 AS
 BEGIN
-	DECLARE @bid INT, @c INT
-	SELECT @bid = branch_id from inserted
-	SELECT @c = COUNT(employee_id) FROM employees
-	WHERE branch_id = @bid
-	IF @c > 3 
+	DECLARE @b_id INT, @e INT
+	SELECT @b_id = branch_id FROM inserted
+	SELECT @e = COUNT(employee_id) FROM employees
+	WHERE branch_id = @b_id
+	IF @e > 3 
 	BEGIN
 		ROLLBACK TRANSACTION
 		;
 		THROW 50001, 'There cannot be more than 3 employees', 1
+	END
+END
+GO
+
+--CREATE TRIGGER FOR CHILDREN DATA INSERT--
+CREATE TRIGGER trChildrenInsert
+ON childrens FOR INSERT
+AS
+BEGIN
+	DECLARE @g_id INT, @c INT
+	SELECT @g_id = gurdian_id FROM inserted
+	SELECT @c = COUNT(children_id) FROM childrens
+	WHERE gurdian_id = @g_id
+	IF @c > 4
+	BEGIN
+	ROLLBACK TRANSACTION
+	;
+	THROW 50001, 'There canot be more than 4 children', 1
 	END
 END
 GO

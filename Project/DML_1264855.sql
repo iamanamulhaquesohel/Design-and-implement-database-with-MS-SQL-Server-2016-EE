@@ -204,13 +204,28 @@ GO
 SELECT * FROM gurdians
 GO
 
---CALING THE SCALAR FUNCTION--
-SELECT dbo.fnScalar (1201) AS 'Children'
+--CALLING THE SCALAR FUNCTION--
+SELECT dbo.fnScalarchildren (1201) AS 'Childrens'
 GO
 
---CALING THE TABLE VALUED FUNCTION--
+SELECT dbo.fnScalaremployee (70001) AS 'Employees'
+GO
+
+--CALLING THE TABLE VALUED FUNCTION--
 SELECT * 
-FROM fnTable(1201)
+FROM fnTablebygurdianId(1201)
+GO
+
+SELECT * 
+FROM fnTablebybranchId(70001)
+GO
+
+SELECT * 
+FROM fnTablebyemployeeId(11101)
+GO
+
+SELECT * 
+FROM fnTablebychildrenId(12601)
 GO
 
 --EXTRACT THE VIEW--
@@ -222,6 +237,7 @@ GO
 SELECT *
 FROM employees
 GO
+
 --THERE IS A ERROR ON INSERTING DATA BY TRIGGER--
 --ERROR--
 INSERT INTO employees
@@ -235,6 +251,28 @@ INSERT INTO employees
 VALUES	(11114, 'Mr. Lablu  ','017XXXXXXXX', 70004),
 		(11115, 'Mohammad Shafayet', '017XXXXXXXX', 70004),
 		(11116, 'Mohammad Yeasin', '017XXXXXXXX',70004)
+GO
+
+--CHECK THE CHILDREN TRIGGER--
+SELECT *
+FROM childrens
+GO
+
+--THERE IS A ERROR ON INSERTING DATA BY TRIGGER--
+--ERROR--
+INSERT INTO childrens
+VALUES	(12628, 'Raju Khan', 70006, 1202 ),
+		(12629, 'Mohon Miah ',  70007, 1207),
+		(12630, 'Mamun Khan',  70008, 1205),
+		(12631, 'Mamun Khan',  70008, 1205),
+		(12632, 'Mamun Khan',  70008, 1208)
+GO
+--INSERTED--
+INSERT INTO childrens
+VALUES	(12628, 'Raju Khan', 70009, 1206 ),
+		(12629, 'Mohon Miah ',  70009, 1206),
+		(12630, 'Mamun Khan',  70010, 1207),
+		(12631, 'Mamun Khan',  70010, 1207)
 GO
 
 --TO DELETE THE CURRENT DATABASE-UN COMMENT THE BELOW CODE AND RUN---
