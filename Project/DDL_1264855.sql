@@ -353,7 +353,7 @@ BEGIN
 	END
 END
 GO
---CRETE A SUB QUERY--
+--CREATE A SUB QUERY FOR GURDIAN AND CHILDREN TABLE--
 SELECT C.*
 FROM ( SELECT gurdians.gurdian_id, gurdian_name,  children_id, children_name, COUNT(children_id) 'Children'
 FROM gurdians 
@@ -362,7 +362,7 @@ GROUP BY gurdians.gurdian_id, gurdian_name, children_id, children_name
 ) AS C
 WHERE gurdian_id = 1201
 GO
---ANOTHER SUB QUERY FOR BRANCH TABLE--
+--CREATE A SUB QUERY FOR BRANCH AND EMPLOYEE TABLE--
 SELECT B.*
 FROM ( SELECT employee_id,employee_name, employee_phone,branches.branch_id, COUNT(employees.branch_id) 'Employee'
 FROM branches 
@@ -372,7 +372,7 @@ GROUP BY employee_id,employee_name, employee_phone,branches.branch_id
 WHERE branch_id = 70001
 GO
 --CREATE A CTE--
---CTE WITH GURDIAN TABLE--
+--CTE WITH GURDIAN AND CHILDREN TABLE--
 WITH CTE AS
 (
 	SELECT gurdian_id, gurdian_name,gurdian_address,gurdian_phn
@@ -382,14 +382,13 @@ SELECT gurdians.gurdian_id, gurdian_name, children_id, children_name, gurdian_ad
 FROM childrens
 INNER JOIN gurdians ON childrens.gurdian_id = childrens.gurdian_id
 GO
---CTE WITH EMPLOYEE TABLE--
-WITH CTE AS
+--CTE WITH BRANCH AND EMPLOYEE TABLE--
+WITH CTE2 AS 
 (
-	SELECT employee_id, employee_name, employee_phone, branch_id
-	FROM employees
+	SELECT branch_id, branch_name, branch_address
+	FROM branches
 )
-SELECT branches.branch_id, branch_name, branch_address, employee_id, employee_name, employee_phone
-FROM branches
-INNER JOIN employees ON employees.branch_id = branches.branch_id
+SELECT branches.branch_id,branches.branch_name, branches.branch_address, employee_id, employee_name, employee_phone
+FROM employees
+INNER JOIN branches ON branches.branch_id = employees.branch_id
 GO
-
